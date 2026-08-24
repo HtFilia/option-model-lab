@@ -2,9 +2,9 @@
 
 [![Verify and deploy](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](https://www.typescriptlang.org/)
-[![Static deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-222222)](https://htfilia.github.io/option-model-lab/)
+[![Static deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-222222)](https://pricing.lucaslebihan.dev/)
 
-**[Open the live interactive lab →](https://htfilia.github.io/option-model-lab/)**
+**[Open the live interactive lab →](https://pricing.lucaslebihan.dev/)**
 
 An interactive educational laboratory for understanding why option-pricing models exist, how their parameters shape outputs, how calibration works, and where each model fails.
 
@@ -22,15 +22,17 @@ This is an educational project, not a trading platform or production pricer.
 Requires Node.js 20.19 or newer.
 
 ```bash
+cd frontend
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. Navigation uses URL hashes, so the same build works beneath a GitHub Pages repository subpath without server rewrites.
+Open the local URL printed by Vite. Navigation uses URL hashes, so the static GitHub Pages build does not require server rewrites.
 
 ## Quality checks
 
 ```bash
+cd frontend
 npm run typecheck
 npm run lint
 npm test
@@ -39,12 +41,12 @@ npm run test:e2e
 npm run build
 ```
 
-Numerical tolerances and their rationale are documented in [`tests/NUMERICAL_TOLERANCES.md`](tests/NUMERICAL_TOLERANCES.md).
+Numerical tolerances and their rationale are documented in [`frontend/tests/NUMERICAL_TOLERANCES.md`](frontend/tests/NUMERICAL_TOLERANCES.md).
 
 ## Architecture
 
-Quantitative logic lives in `src/quant` and has no React dependency. Feature-level transformations build charts and comparisons from concrete model functions; there is deliberately no universal pricing-model or calibration abstraction. Heston uses Fourier quadrature, Merton uses a Poisson mixture, SABR uses the Hagan approximation with Black-76, and Local Vol reconstructs Dupire volatility from a constrained SSVI total-variance surface. Only the heavier Heston calibration needs a model-specific Web Worker. Educational copy remains in structured content modules rather than large React components.
+Quantitative logic lives in `frontend/src/quant` and has no React dependency. Feature-level transformations build charts and comparisons from concrete model functions; there is deliberately no universal pricing-model or calibration abstraction. Heston uses Fourier quadrature, Merton uses a Poisson mixture, SABR uses the Hagan approximation with Black-76, and Local Vol reconstructs Dupire volatility from a constrained SSVI total-variance surface. Only the heavier Heston calibration needs a model-specific Web Worker. Educational copy remains in structured content modules rather than large React components.
 
-The application is fully static. The Pages workflow installs from `package-lock.json`, type-checks, lints, runs unit and smoke tests, builds with the repository base path, and deploys the `dist` artifact using GitHub's standard Pages permissions.
+The application is fully static. The Pages workflow installs from `frontend/package-lock.json`, type-checks, lints, runs unit and smoke tests, builds for the custom-domain root, and deploys `frontend/dist` using GitHub's standard Pages permissions.
 
 The governing product, architecture, and numerical conventions are in [`docs/`](docs/).

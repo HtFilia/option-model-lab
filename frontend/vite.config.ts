@@ -1,20 +1,13 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
-const [repositoryOwner, repositoryName] = process.env.GITHUB_REPOSITORY?.split('/') ?? [];
+const productionSiteUrl = 'https://pricing.lucaslebihan.dev/';
 
 export default defineConfig(({ command }) => {
-  const isGitHubPagesBuild = Boolean(
-    command === 'build' && process.env.GITHUB_ACTIONS && repositoryName,
-  );
-  const base = isGitHubPagesBuild ? `/${repositoryName}/` : '/';
-  const siteUrl =
-    isGitHubPagesBuild && repositoryOwner && repositoryName
-      ? `https://${repositoryOwner.toLowerCase()}.github.io/${repositoryName}/`
-      : 'http://localhost:5173/';
+  const siteUrl = command === 'build' ? productionSiteUrl : 'http://localhost:5173/';
 
   return {
-    base,
+    base: '/',
     plugins: [
       react(),
       {
