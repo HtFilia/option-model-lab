@@ -1,6 +1,22 @@
 import { expect, test } from '@playwright/test';
+import {
+  buildHestonCalibrationFixture,
+  calibrateHestonFixture,
+} from '../../src/features/hestonLab';
+
+const hestonMarket = { spot: 100, riskFreeRate: 0.03, dividendYield: 0.01 };
+const remoteHestonResult = calibrateHestonFixture(
+  hestonMarket,
+  buildHestonCalibrationFixture(hestonMarket),
+);
 
 test('explores price sensitivity and solves an implied volatility', async ({ page }) => {
+  let hestonApiAvailable = false;
+  await page.route('http://127.0.0.1:8000/**', (route) =>
+    hestonApiAvailable
+      ? route.fulfill({ status: 200, json: remoteHestonResult })
+      : route.abort('connectionrefused'),
+  );
   await page.goto('/#/learn');
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -73,6 +89,11 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await page.getByRole('button', { name: 'Run bounded calibration' }).click();
   await expect(page.getByTestId('heston-calibration-result')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText('Converged', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('heston-execution-source')).toHaveText('Local browser fallback');
+
+  hestonApiAvailable = true;
+  await page.getByRole('button', { name: 'Run bounded calibration' }).click();
+  await expect(page.getByTestId('heston-execution-source')).toHaveText('Remote API');
 
   await page.getByRole('button', { name: 'Compare Black–Scholes and Heston' }).click();
   await expect(page).toHaveURL(/#\/compare$/);
