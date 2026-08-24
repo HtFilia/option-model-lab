@@ -15,6 +15,7 @@ import { buildBlackScholesHestonComparison } from '../features/modelComparison';
 import type { OptionType } from '../quant/blackScholes';
 import type { HestonParameters } from '../quant/heston';
 import { OptionTypeToggle, ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 interface ComparisonInputs {
   type: OptionType;
@@ -379,6 +380,25 @@ export function CompareView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="One fit point, an entire smile"
+                    data={state.result.strikePoints}
+                    xKey="strike"
+                    xLabel="Strike"
+                    xFormat={(value) => value.toFixed(0)}
+                    series={[
+                      {
+                        key: 'hestonImpliedVolatility',
+                        label: 'Heston implied volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'blackScholesVolatility',
+                        label: 'Black–Scholes volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>Implied volatility by strike at the selected maturity.</figcaption>
                 </figure>
 
@@ -452,6 +472,25 @@ export function CompareView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Freeze the fit, then move spot"
+                    data={state.result.spotPoints}
+                    xKey="spot"
+                    xLabel="Spot"
+                    xFormat={(value) => value.toFixed(0)}
+                    series={[
+                      {
+                        key: 'hestonPrice',
+                        label: 'Heston price',
+                        format: (value) => value.toFixed(4),
+                      },
+                      {
+                        key: 'blackScholesPrice',
+                        label: 'Black–Scholes price',
+                        format: (value) => value.toFixed(4),
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Option value under spot scenarios with model parameters held fixed.
                   </figcaption>

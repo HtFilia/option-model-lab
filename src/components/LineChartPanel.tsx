@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 export interface ChartPoint {
   spot: number;
@@ -89,6 +90,14 @@ export function LineChartPanel({
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <ChartAccessibleSummary
+        title={title}
+        data={data}
+        xKey="spot"
+        xLabel="Spot"
+        xFormat={spotFormatter}
+        series={[{ key: 'value', label: valueLabel, format: valueFormatter }]}
+      />
       <figcaption>{description}</figcaption>
     </figure>
   );

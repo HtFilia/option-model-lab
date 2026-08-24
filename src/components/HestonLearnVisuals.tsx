@@ -14,6 +14,7 @@ import {
   defaultHestonParameters,
   simulateHestonVolatilityPaths,
 } from '../features/hestonLab';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const correlations = [-0.8, -0.4, 0] as const;
 const market = { spot: 100, riskFreeRate: 0.03, dividendYield: 0.01 };
@@ -120,6 +121,25 @@ export function HestonLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Heston implied-volatility smile"
+            data={smile}
+            xKey="strike"
+            xLabel="Strike"
+            series={[
+              {
+                key: 'hestonVolatility',
+                label: 'Heston implied volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+              {
+                key: 'flatVolatility',
+                label: 'Flat initial volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>
             One-year call implied volatilities under Heston as correlation changes, compared with
             the flat initial volatility √v₀.
@@ -183,6 +203,19 @@ export function HestonLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Seeded instantaneous-volatility paths"
+            data={paths}
+            xKey="time"
+            xLabel="Time"
+            series={[
+              { key: 'path1', label: 'Path 1', format: (value) => `${(value * 100).toFixed(2)}%` },
+              { key: 'path2', label: 'Path 2', format: (value) => `${(value * 100).toFixed(2)}%` },
+              { key: 'path3', label: 'Path 3', format: (value) => `${(value * 100).toFixed(2)}%` },
+              { key: 'path4', label: 'Path 4', format: (value) => `${(value * 100).toFixed(2)}%` },
+            ]}
+            showTable={false}
+          />
           <figcaption>
             Four seeded full-truncation Euler illustrations of instantaneous volatility. The dashed
             line is √θ. Pricing uses Fourier inversion, not these simulated paths.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface ModelSectionLink {
   id: string;
@@ -20,6 +20,7 @@ export function ModelSectionNav({
   modelIndex,
 }: ModelSectionNavProps) {
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? 'overview');
+  const listRef = useRef<HTMLOListElement>(null);
 
   useEffect(() => {
     const parts = window.location.hash.replace(/^#\/?/, '').split('/');
@@ -35,6 +36,18 @@ export function ModelSectionNav({
       setActiveSection(requestedSection);
     });
   }, [sections]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    const activeLink = list?.querySelector<HTMLElement>('a.active');
+    if (!list || !activeLink || !window.matchMedia('(max-width: 820px)').matches) return;
+
+    const left = activeLink.offsetLeft - (list.clientWidth - activeLink.offsetWidth) / 2;
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
+    list.scrollTo({ left: Math.max(0, left), behavior });
+  }, [activeSection]);
 
   useEffect(() => {
     const elements = sections
@@ -74,7 +87,7 @@ export function ModelSectionNav({
           <span>Model {modelIndex}</span>
           <strong>On this page</strong>
         </div>
-        <ol>
+        <ol ref={listRef}>
           {sections.map((section) => (
             <li key={section.id}>
               <a

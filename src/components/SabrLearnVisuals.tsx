@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import { buildSabrSmile, buildSabrTermSlices, defaultSabrParameters } from '../features/sabrLab';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const tooltipStyle = {
   border: '1px solid var(--strong-line)',
@@ -107,6 +108,20 @@ export function SabrLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="SABR strike smile"
+            data={smile}
+            xKey="strikePercent"
+            xLabel="Strike"
+            series={[
+              {
+                key: 'impliedVolatility',
+                label: 'SABR volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>Two-year Black implied volatility for a 3% forward.</figcaption>
         </figure>
         <figure className="learning-chart">
@@ -162,6 +177,30 @@ export function SabrLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="SABR moneyness slices across maturity"
+            data={term}
+            xKey="maturity"
+            xLabel="Maturity"
+            series={[
+              {
+                key: 'lowStrikeVolatility',
+                label: '75% forward volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+              {
+                key: 'atmVolatility',
+                label: 'ATM volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+              {
+                key: 'highStrikeVolatility',
+                label: '125% forward volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>Selected moneyness slices across maturity.</figcaption>
         </figure>
       </div>

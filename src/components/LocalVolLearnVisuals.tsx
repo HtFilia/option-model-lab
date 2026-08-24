@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import { buildLocalVolSlice, defaultLocalVolSurfaceParameters } from '../features/localVolLab';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const tooltipStyle = {
   border: '1px solid var(--strong-line)',
@@ -111,6 +112,25 @@ export function LocalVolLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Implied and local volatility at one year"
+            data={slice}
+            xKey="strike"
+            xLabel="Normalized strike"
+            series={[
+              {
+                key: 'impliedVolatility',
+                label: 'Implied volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+              {
+                key: 'sourceLocalVolatility',
+                label: 'Local volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>Analytic SSVI implied and Dupire local volatility at one year.</figcaption>
         </figure>
       </div>

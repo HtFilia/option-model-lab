@@ -22,6 +22,16 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
 
   await page.getByRole('button', { name: 'Explore' }).click();
 
+  const firstChart = page.locator('.chart-canvas').first();
+  await expect
+    .poll(() =>
+      firstChart
+        .locator('.recharts-wrapper')
+        .evaluate((element) => Math.round(element.getBoundingClientRect().width)),
+    )
+    .toBeGreaterThan(100);
+  await expect(firstChart.locator('path.recharts-curve')).toHaveCount(1);
+
   const initialPrice = await page.getByTestId('option-price').textContent();
   await page.getByRole('spinbutton', { name: /Annualized volatility/ }).fill('40');
   await expect(page.getByTestId('option-price')).not.toHaveText(initialPrice ?? '');
@@ -49,6 +59,7 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await atTheMoneyQuote.click();
   await expect(page.getByTestId('implied-volatility')).toHaveText('25.000000%');
 
+  await page.getByRole('button', { name: 'Learn', exact: true }).click();
   await page.getByRole('button', { name: 'Heston', exact: true }).click();
   await expect(page).toHaveURL(/#\/heston\/learn$/);
   await expect(page.getByRole('navigation', { name: 'Heston explanation sections' })).toBeVisible();
@@ -63,7 +74,7 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await expect(page.getByTestId('heston-calibration-result')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText('Converged', { exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Compare', exact: true }).click();
+  await page.getByRole('button', { name: 'Compare Black–Scholes and Heston' }).click();
   await expect(page).toHaveURL(/#\/compare$/);
   await expect(page.getByRole('heading', { name: 'Same quote. Different world.' })).toBeVisible();
   const initialDifference = await page.getByTestId('comparison-price-difference').textContent();
@@ -88,6 +99,7 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await expect(page.getByTestId('merton-calibration-result')).toBeVisible();
   await expect(page.getByText('Converged', { exact: true })).toBeVisible();
 
+  await page.getByRole('button', { name: 'Learn', exact: true }).click();
   await page.getByRole('button', { name: 'SABR', exact: true }).click();
   await expect(page).toHaveURL(/#\/sabr\/learn$/);
   await expect(page.getByRole('navigation', { name: 'SABR explanation sections' })).toBeVisible();
@@ -101,6 +113,7 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await expect(page.getByTestId('sabr-calibration-result')).toBeVisible();
   await expect(page.getByText('Converged', { exact: true })).toBeVisible();
 
+  await page.getByRole('button', { name: 'Learn', exact: true }).click();
   await page.getByRole('button', { name: 'Local Vol', exact: true }).click();
   await expect(page).toHaveURL(/#\/local-vol\/learn$/);
   await expect(
@@ -117,4 +130,50 @@ test('explores price sensitivity and solves an implied volatility', async ({ pag
   await page.getByRole('slider', { name: 'Quote perturbation slider' }).fill('20');
   await expect(page.getByTestId('local-vol-rmse')).not.toHaveText(initialRmse ?? '');
   await expect(page.getByTestId('local-vol-reconstruction-result')).toBeVisible();
+});
+
+test('keeps navigation context and remains usable on a narrow screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/black-scholes/learn');
+
+  const modelNavigation = page.getByRole('navigation', { name: 'Pricing model' });
+  for (const model of ['Black–Scholes', 'Heston', 'Merton Jump Diffusion', 'SABR', 'Local Vol']) {
+    await expect(modelNavigation.getByRole('button', { name: model, exact: true })).toBeVisible();
+  }
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await modelNavigation.getByRole('button', { name: 'Heston', exact: true }).click();
+  await expect(page).toHaveURL(/#\/heston\/learn$/);
+  await expect(page.getByRole('heading', { name: 'Heston', exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(20);
+
+  await page.getByRole('button', { name: 'Explore', exact: true }).click();
+  await modelNavigation.getByRole('button', { name: 'SABR', exact: true }).click();
+  await expect(page).toHaveURL(/#\/sabr\/explore$/);
+  await expect(page).toHaveTitle(/SABR · Explore — Option Model Lab/);
+  await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBeLessThan(20);
+
+  const labModes = page.getByRole('navigation', { name: 'Lab mode' });
+  await expect(labModes.getByRole('button', { name: /Compare/ })).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Compare Black–Scholes and Heston' }),
+  ).toBeVisible();
+  await expect(page.getByText('View representative chart values').first()).toBeVisible();
+
+  for (const route of [
+    '#/black-scholes/calibrate',
+    '#/heston/calibrate',
+    '#/local-vol/learn',
+    '#/local-vol/calibrate',
+  ]) {
+    await page.goto(`/${route}`);
+    await expect(page.locator('main h1')).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      )
+      .toBeLessThanOrEqual(1);
+  }
 });

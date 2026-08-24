@@ -17,6 +17,7 @@ import {
   buildMertonTerminalDensity,
   defaultMertonJumpParameters,
 } from '../features/mertonJumpLab';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const intensities = [0, 0.8, 2] as const;
 const market = { spot: 100, riskFreeRate: 0.03, dividendYield: 0.01 };
@@ -127,6 +128,25 @@ export function MertonLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Merton implied-volatility smile"
+            data={smile}
+            xKey="strike"
+            xLabel="Strike"
+            series={[
+              {
+                key: 'mertonImpliedVolatility',
+                label: 'Merton implied volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+              {
+                key: 'diffusionVolatility',
+                label: 'Diffusion volatility',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>
             Three-month implied volatility by strike under Merton jump diffusion.
           </figcaption>
@@ -172,6 +192,17 @@ export function MertonLearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Merton and diffusion terminal density"
+            data={density}
+            xKey="spot"
+            xLabel="Terminal spot"
+            series={[
+              { key: 'mertonDensity', label: 'Merton density' },
+              { key: 'diffusionDensity', label: 'Diffusion density' },
+            ]}
+            showTable={false}
+          />
           <figcaption>Merton and diffusion-only terminal spot densities.</figcaption>
         </figure>
 
@@ -210,6 +241,20 @@ export function MertonLearnVisuals() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Poisson jump-count probabilities"
+            data={jumpCounts}
+            xKey="jumps"
+            xLabel="Jump count"
+            series={[
+              {
+                key: 'probability',
+                label: 'Probability',
+                format: (value) => `${(value * 100).toFixed(2)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>Poisson jump-count probabilities over three months.</figcaption>
         </figure>
       </div>

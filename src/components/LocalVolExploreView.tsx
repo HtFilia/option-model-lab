@@ -19,6 +19,7 @@ import {
   type SsviParameters,
 } from '../quant/localVol';
 import { OptionTypeToggle, ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 interface Inputs {
   type: OptionType;
@@ -353,6 +354,25 @@ export function LocalVolExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Implied and local volatility versus strike"
+                    data={state.slice}
+                    xKey="strike"
+                    xLabel="Normalized strike"
+                    xFormat={(value) => value.toFixed(1)}
+                    series={[
+                      {
+                        key: 'impliedVolatility',
+                        label: 'Implied volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                      {
+                        key: 'sourceLocalVolatility',
+                        label: 'Local volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Normalized forward-centered strike slice at the selected maturity.
                   </figcaption>
@@ -403,6 +423,25 @@ export function LocalVolExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Selected moneyness across maturity"
+                    data={state.term}
+                    xKey="time"
+                    xLabel="Maturity"
+                    xFormat={(value) => `${value.toFixed(2)} years`}
+                    series={[
+                      {
+                        key: 'impliedVolatility',
+                        label: 'Implied volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                      {
+                        key: 'localVolatility',
+                        label: 'Local volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>Term slices at the selected forward log-moneyness.</figcaption>
                 </figure>
               </div>
