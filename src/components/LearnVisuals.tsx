@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { blackScholesContent as content } from '../content/blackScholes';
 import { europeanOptionPayoff, priceBlackScholes } from '../quant/blackScholes';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const volatilityChoices = [0.1, 0.2, 0.4] as const;
 
@@ -137,6 +138,17 @@ export function LearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Call value today and payoff at expiry"
+            data={priceData}
+            xKey="spot"
+            xLabel="Spot"
+            series={[
+              { key: 'price', label: 'Value today' },
+              { key: 'payoff', label: 'Payoff at expiry' },
+            ]}
+            showTable={false}
+          />
           <figcaption>
             Call value today and payoff at expiry across spot prices from 40 to 160, with strike 100
             and the selected constant volatility.
@@ -189,6 +201,14 @@ export function LearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Call delta across spot"
+            data={priceData}
+            xKey="spot"
+            xLabel="Spot"
+            series={[{ key: 'delta', label: 'Delta' }]}
+            showTable={false}
+          />
           <figcaption>
             Analytic call delta across spot, ranging from approximately zero to one share.
           </figcaption>
@@ -258,6 +278,25 @@ export function LearnVisuals() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <ChartAccessibleSummary
+            title="Constant model volatility versus synthetic market skew"
+            data={content.visualIntuition.smileScenario}
+            xKey="strike"
+            xLabel="Strike"
+            series={[
+              {
+                key: 'modelVolatility',
+                label: 'Constant model volatility',
+                format: (value) => `${value.toFixed(1)}%`,
+              },
+              {
+                key: 'syntheticMarketVolatility',
+                label: 'Synthetic market volatility',
+                format: (value) => `${value.toFixed(1)}%`,
+              },
+            ]}
+            showTable={false}
+          />
           <figcaption>
             Synthetic educational implied-volatility quotes compared with a constant 20 percent
             Black–Scholes volatility. This is not live market data.

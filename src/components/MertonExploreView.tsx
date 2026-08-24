@@ -24,6 +24,7 @@ import {
   type MertonJumpParameters,
 } from '../quant/mertonJumpDiffusion';
 import { OptionTypeToggle, ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 interface ExploreInputs {
   type: OptionType;
@@ -384,6 +385,25 @@ export function MertonExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Short-maturity implied-volatility smile"
+                    data={state.smile}
+                    xKey="strike"
+                    xLabel="Strike"
+                    xFormat={(value) => value.toFixed(0)}
+                    series={[
+                      {
+                        key: 'mertonImpliedVolatility',
+                        label: 'Merton implied volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'diffusionVolatility',
+                        label: 'Diffusion volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Implied volatility against strike for the selected maturity.
                   </figcaption>
@@ -449,6 +469,25 @@ export function MertonExploreView() {
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
+                    <ChartAccessibleSummary
+                      title="Terminal spot density"
+                      data={state.density}
+                      xKey="spot"
+                      xLabel="Terminal spot"
+                      xFormat={(value) => value.toFixed(0)}
+                      series={[
+                        {
+                          key: 'mertonDensity',
+                          label: 'Merton density',
+                          format: (value) => value.toFixed(5),
+                        },
+                        {
+                          key: 'diffusionDensity',
+                          label: 'Diffusion density',
+                          format: (value) => value.toFixed(5),
+                        },
+                      ]}
+                    />
                     <figcaption>Risk-neutral terminal spot density.</figcaption>
                   </figure>
                   <figure className="chart-panel">
@@ -501,6 +540,20 @@ export function MertonExploreView() {
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
+                    <ChartAccessibleSummary
+                      title="Number of jumps by maturity"
+                      data={state.jumpCounts}
+                      xKey="jumps"
+                      xLabel="Jump count"
+                      xFormat={(value) => (value === 4 ? '4 or more' : value.toFixed(0))}
+                      series={[
+                        {
+                          key: 'probability',
+                          label: 'Probability',
+                          format: (value) => `${(value * 100).toFixed(2)}%`,
+                        },
+                      ]}
+                    />
                     <figcaption>Poisson jump-count probabilities.</figcaption>
                   </figure>
                 </div>

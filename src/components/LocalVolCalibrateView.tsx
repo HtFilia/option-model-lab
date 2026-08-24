@@ -18,6 +18,7 @@ import {
 } from '../features/localVolLab';
 import { ssviNoArbitrageMargins } from '../quant/localVol';
 import { ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 const tooltipStyle = {
   border: '1px solid var(--strong-line)',
@@ -267,6 +268,25 @@ export function LocalVolCalibrateView() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
+            <ChartAccessibleSummary
+              title="Source versus reconstructed local volatility"
+              data={slice}
+              xKey="strike"
+              xLabel="Normalized strike"
+              xFormat={(value) => value.toFixed(1)}
+              series={[
+                {
+                  key: 'sourceLocalVolatility',
+                  label: 'Analytic source',
+                  format: (value) => `${(value * 100).toFixed(3)}%`,
+                },
+                {
+                  key: 'reconstructedLocalVolatility',
+                  label: 'Reconstructed volatility',
+                  format: (value) => `${(value * 100).toFixed(3)}%`,
+                },
+              ]}
+            />
             <figcaption>
               Dupire local volatility from analytic SSVI and sparse interpolated quotes.
             </figcaption>
@@ -324,6 +344,30 @@ export function LocalVolCalibrateView() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
+            <ChartAccessibleSummary
+              title="Observed implied-volatility slices"
+              data={merged}
+              xKey="strike"
+              xLabel="Strike"
+              xFormat={(value) => value.toFixed(1)}
+              series={[
+                {
+                  key: 'vol05',
+                  label: '0.5 year volatility',
+                  format: (value) => `${(value * 100).toFixed(3)}%`,
+                },
+                {
+                  key: 'vol1',
+                  label: '1 year volatility',
+                  format: (value) => `${(value * 100).toFixed(3)}%`,
+                },
+                {
+                  key: 'vol2',
+                  label: '2 year volatility',
+                  format: (value) => `${(value * 100).toFixed(3)}%`,
+                },
+              ]}
+            />
             <figcaption>Sparse synthetic market quotes before differentiation.</figcaption>
           </figure>
         </div>

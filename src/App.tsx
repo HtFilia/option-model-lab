@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
 import { LearnView } from './components/LearnView';
 
 const ExploreView = lazy(() =>
@@ -73,6 +73,7 @@ interface RouteState {
 }
 
 const modes: readonly Mode[] = ['learn', 'explore', 'calibrate', 'compare'];
+const labModes: readonly Exclude<Mode, 'compare'>[] = ['learn', 'explore', 'calibrate'];
 const models: readonly { slug: ModelSlug; label: string; shortLabel: string }[] = [
   { slug: 'black-scholes', label: 'Black–Scholes', shortLabel: 'BS' },
   { slug: 'heston', label: 'Heston', shortLabel: 'Heston' },
@@ -104,6 +105,7 @@ function routeFromHash(): RouteState {
 export default function App() {
   const [route, setRoute] = useState<RouteState>(routeFromHash);
   const [theme, setTheme] = useState<Theme>(themeFromStorage);
+  const currentModel = models.find(({ slug }) => slug === route.model)!;
 
   useEffect(() => {
     const onRouteChange = () => setRoute(routeFromHash());
@@ -124,6 +126,18 @@ export default function App() {
       ?.setAttribute('content', theme === 'dark' ? '#1c1914' : '#f2e7d3');
   }, [theme]);
 
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [route.model, route.mode]);
+
+  useEffect(() => {
+    const routeTitle =
+      route.mode === 'compare'
+        ? 'Black–Scholes vs Heston · Compare'
+        : `${currentModel.label} · ${route.mode[0]?.toUpperCase()}${route.mode.slice(1)}`;
+    document.title = `${routeTitle} — Option Model Lab`;
+  }, [currentModel.label, route.mode]);
+
   function navigateMode(nextMode: Mode) {
     window.history.pushState(
       null,
@@ -134,11 +148,10 @@ export default function App() {
   }
 
   function navigateModel(nextModel: ModelSlug) {
-    window.history.pushState(null, '', `#/${nextModel}/learn`);
-    setRoute({ model: nextModel, mode: 'learn' });
+    const nextMode = route.mode === 'compare' ? 'learn' : route.mode;
+    window.history.pushState(null, '', `#/${nextModel}/${nextMode}`);
+    setRoute({ model: nextModel, mode: nextMode });
   }
-
-  const currentModel = models.find(({ slug }) => slug === route.model)!;
 
   return (
     <div className="app-frame">
@@ -161,6 +174,7 @@ export default function App() {
               aria-current={
                 route.mode !== 'compare' && route.model === model.slug ? 'page' : undefined
               }
+              aria-label={model.label}
               onClick={() => navigateModel(model.slug)}
             >
               <span className="model-label-full">{model.label}</span>
@@ -172,7 +186,7 @@ export default function App() {
         </nav>
         <div className="header-actions">
           <nav className="mode-nav" aria-label="Lab mode">
-            {modes.map((item) => (
+            {labModes.map((item) => (
               <button
                 type="button"
                 key={item}
@@ -185,6 +199,19 @@ export default function App() {
               </button>
             ))}
           </nav>
+          <button
+            className={`global-compare-button ${route.mode === 'compare' ? 'active' : ''}`}
+            type="button"
+            aria-current={route.mode === 'compare' ? 'page' : undefined}
+            aria-label="Compare Black–Scholes and Heston"
+            title="Compare Black–Scholes and Heston"
+            onClick={() => navigateMode('compare')}
+          >
+            <span className="compare-label-full">BS ↔ Heston</span>
+            <span className="compare-label-short" aria-hidden="true">
+              Compare
+            </span>
+          </button>
           <button
             className="theme-toggle"
             type="button"
@@ -201,6 +228,7 @@ export default function App() {
       </header>
 
       <Suspense
+        key={`${route.model}/${route.mode}`}
         fallback={
           <main id="main-content" className="page-shell loading-page" aria-live="polite">
             <p className="eyebrow">

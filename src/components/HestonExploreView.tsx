@@ -17,6 +17,7 @@ import {
   simulateHestonVolatilityPaths,
 } from '../features/hestonLab';
 import { OptionTypeToggle, ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 interface ExploreInputs {
   type: OptionType;
@@ -377,6 +378,25 @@ export function HestonExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Implied-volatility smile"
+                    data={state.smile}
+                    xKey="strike"
+                    xLabel="Strike"
+                    xFormat={(value) => value.toFixed(0)}
+                    series={[
+                      {
+                        key: 'hestonVolatility',
+                        label: 'Heston implied volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'flatVolatility',
+                        label: 'Flat initial volatility',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Implied volatility against strike for the selected maturity.
                   </figcaption>
@@ -445,6 +465,35 @@ export function HestonExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Seeded instantaneous-volatility paths"
+                    data={state.paths}
+                    xKey="time"
+                    xLabel="Time"
+                    xFormat={(value) => `${value.toFixed(2)} years`}
+                    series={[
+                      {
+                        key: 'path1',
+                        label: 'Path 1',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'path2',
+                        label: 'Path 2',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'path3',
+                        label: 'Path 3',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                      {
+                        key: 'path4',
+                        label: 'Path 4',
+                        format: (value) => `${(value * 100).toFixed(2)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Full-truncation Euler paths for intuition only; pricing uses Fourier inversion.
                   </figcaption>

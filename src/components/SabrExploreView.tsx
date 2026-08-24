@@ -12,6 +12,7 @@ import {
 import { buildSabrSmile, buildSabrTermSlices, defaultSabrParameters } from '../features/sabrLab';
 import { priceSabr, SabrError, type ForwardOptionType, type SabrParameters } from '../quant/sabr';
 import { OptionTypeToggle, ParameterControl } from './LabControls';
+import { ChartAccessibleSummary } from './ChartAccessibleSummary';
 
 interface ExploreInputs {
   type: ForwardOptionType;
@@ -302,6 +303,25 @@ export function SabrExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Implied volatility versus strike"
+                    data={state.smile}
+                    xKey="strikePercent"
+                    xLabel="Strike"
+                    xFormat={(value) => `${value.toFixed(2)}%`}
+                    series={[
+                      {
+                        key: 'impliedVolatility',
+                        label: 'SABR volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                      {
+                        key: 'flatVolatility',
+                        label: 'Flat ATM volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>Black lognormal implied volatility by strike.</figcaption>
                 </figure>
                 <figure className="chart-panel">
@@ -353,6 +373,25 @@ export function SabrExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Call value versus strike"
+                    data={state.smile}
+                    xKey="strikePercent"
+                    xLabel="Strike"
+                    xFormat={(value) => `${value.toFixed(2)}%`}
+                    series={[
+                      {
+                        key: 'sabrPrice',
+                        label: 'SABR price',
+                        format: (value) => `${(value * 10000).toFixed(2)} bp`,
+                      },
+                      {
+                        key: 'flatPrice',
+                        label: 'Flat-volatility price',
+                        format: (value) => `${(value * 10000).toFixed(2)} bp`,
+                      },
+                    ]}
+                  />
                   <figcaption>Black-76 call value from the two volatility assumptions.</figcaption>
                 </figure>
                 <figure className="chart-panel">
@@ -405,6 +444,30 @@ export function SabrExploreView() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  <ChartAccessibleSummary
+                    title="Strike slices across maturity"
+                    data={state.term}
+                    xKey="maturity"
+                    xLabel="Maturity"
+                    xFormat={(value) => `${value.toFixed(2)} years`}
+                    series={[
+                      {
+                        key: 'lowStrikeVolatility',
+                        label: '75% forward volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                      {
+                        key: 'atmVolatility',
+                        label: 'ATM volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                      {
+                        key: 'highStrikeVolatility',
+                        label: '125% forward volatility',
+                        format: (value) => `${(value * 100).toFixed(3)}%`,
+                      },
+                    ]}
+                  />
                   <figcaption>
                     Three moneyness slices reveal maturity effects without pretending one slice is a
                     calibrated surface.
