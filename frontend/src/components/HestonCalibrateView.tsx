@@ -19,6 +19,10 @@ import {
   type HestonCalibrationFitPoint,
   type HestonCalibrationResult,
 } from '../features/hestonLab';
+import {
+  executeHestonCalibration,
+  type HestonCalibrationExecutionSource,
+} from '../features/hestonCalibrationExecution';
 import type { HestonParameters } from '../quant/heston';
 
 const market = { spot: 100, riskFreeRate: 0.03, dividendYield: 0.01 };
@@ -57,11 +61,17 @@ export function HestonCalibrateView() {
   const [status, setStatus] = useState<'idle' | 'running' | 'complete' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [elapsedMilliseconds, setElapsedMilliseconds] = useState<number | null>(null);
+  const [executionSource, setExecutionSource] = useState<HestonCalibrationExecutionSource | null>(
+    null,
+  );
+  const [executionNotice, setExecutionNotice] = useState<string | null>(null);
   const [selectedMaturity, setSelectedMaturity] = useState(1);
   const workerRef = useRef<Worker | null>(null);
+  const runIdRef = useRef(0);
 
   useEffect(
     () => () => {
+      runIdRef.current += 1;
       workerRef.current?.terminate();
     },
     [],
@@ -74,53 +84,63 @@ export function HestonCalibrateView() {
   );
   const displayedParameters = result?.parameters ?? hestonCalibrationInitialParameters;
 
-  function runCalibration() {
+  function runLocalCalibration(): Promise<HestonCalibrationResult> {
+    if (typeof Worker === 'undefined') {
+      return Promise.resolve(calibrateHestonFixture(market, quotes));
+    }
+
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(
+        new URL('../workers/hestonCalibration.worker.ts', import.meta.url),
+        {
+          type: 'module',
+        },
+      );
+      workerRef.current = worker;
+      worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+        workerRef.current = null;
+        worker.terminate();
+        if (event.data.result) resolve(event.data.result);
+        else reject(new Error(event.data.error ?? 'The calibration could not complete.'));
+      };
+      worker.onerror = () => {
+        workerRef.current = null;
+        worker.terminate();
+        reject(new Error('The calibration worker stopped unexpectedly.'));
+      };
+      worker.postMessage({ market });
+    });
+  }
+
+  async function runCalibration() {
     workerRef.current?.terminate();
+    workerRef.current = null;
+    const runId = runIdRef.current + 1;
+    runIdRef.current = runId;
     setStatus('running');
     setError(null);
     setResult(null);
+    setExecutionSource(null);
+    setExecutionNotice(null);
     const startedAt = performance.now();
 
-    if (typeof Worker === 'undefined') {
-      try {
-        const fallbackResult = calibrateHestonFixture(market, quotes);
-        setResult(fallbackResult);
-        setElapsedMilliseconds(performance.now() - startedAt);
-        setStatus('complete');
-      } catch (calibrationError) {
-        setError(
-          calibrationError instanceof Error
-            ? calibrationError.message
-            : 'The calibration could not complete.',
-        );
-        setStatus('error');
-      }
-      return;
-    }
-
-    const worker = new Worker(new URL('../workers/hestonCalibration.worker.ts', import.meta.url), {
-      type: 'module',
-    });
-    workerRef.current = worker;
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      workerRef.current = null;
-      worker.terminate();
+    try {
+      const execution = await executeHestonCalibration(market, quotes, runLocalCalibration);
+      if (runIdRef.current !== runId) return;
+      setResult(execution.result);
+      setExecutionSource(execution.source);
+      setExecutionNotice(execution.notice);
       setElapsedMilliseconds(performance.now() - startedAt);
-      if (event.data.result) {
-        setResult(event.data.result);
-        setStatus('complete');
-      } else {
-        setError(event.data.error ?? 'The calibration could not complete.');
-        setStatus('error');
-      }
-    };
-    worker.onerror = () => {
-      workerRef.current = null;
-      worker.terminate();
-      setError('The calibration worker stopped unexpectedly.');
+      setStatus('complete');
+    } catch (calibrationError) {
+      if (runIdRef.current !== runId) return;
+      setError(
+        calibrationError instanceof Error
+          ? calibrationError.message
+          : 'The calibration could not complete.',
+      );
       setStatus('error');
-    };
-    worker.postMessage({ market });
+    }
   }
 
   return (
@@ -176,8 +196,8 @@ export function HestonCalibrateView() {
             {status === 'running' ? 'Calibrating surface…' : 'Run bounded calibration'}
           </button>
           <p className="worker-note">
-            The deterministic simplex search runs off the main interface thread because profiling
-            showed that repeated Fourier valuations create a visible pause.
+            The fit is requested from the bounded computation API. If it is unreachable, the same
+            deterministic TypeScript engine runs locally without blocking the interface.
           </p>
         </div>
 
@@ -228,34 +248,47 @@ export function HestonCalibrateView() {
           ) : null}
 
           {result ? (
-            <dl className="calibration-diagnostics" data-testid="heston-calibration-result">
-              <div>
-                <dt>Initial objective</dt>
-                <dd>{result.initialObjective.toExponential(4)}</dd>
-              </div>
-              <div>
-                <dt>Final objective</dt>
-                <dd data-testid="heston-final-objective">
-                  {result.finalObjective.toExponential(4)}
-                </dd>
-              </div>
-              <div>
-                <dt>Iterations</dt>
-                <dd>{result.iterations}</dd>
-              </div>
-              <div>
-                <dt>Valuations</dt>
-                <dd>{result.evaluations * quotes.length}</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>{result.converged ? 'Converged' : 'Stopped'}</dd>
-              </div>
-              <div>
-                <dt>Elapsed</dt>
-                <dd>{elapsedMilliseconds?.toFixed(0)} ms</dd>
-              </div>
-            </dl>
+            <>
+              {executionNotice ? (
+                <p className="calibration-execution-notice" role="status">
+                  {executionNotice}
+                </p>
+              ) : null}
+              <dl className="calibration-diagnostics" data-testid="heston-calibration-result">
+                <div>
+                  <dt>Initial objective</dt>
+                  <dd>{result.initialObjective.toExponential(4)}</dd>
+                </div>
+                <div>
+                  <dt>Final objective</dt>
+                  <dd data-testid="heston-final-objective">
+                    {result.finalObjective.toExponential(4)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Iterations</dt>
+                  <dd>{result.iterations}</dd>
+                </div>
+                <div>
+                  <dt>Valuations</dt>
+                  <dd>{result.evaluations * quotes.length}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{result.converged ? 'Converged' : 'Stopped'}</dd>
+                </div>
+                <div>
+                  <dt>Elapsed</dt>
+                  <dd>{elapsedMilliseconds?.toFixed(0)} ms</dd>
+                </div>
+                <div>
+                  <dt>Execution</dt>
+                  <dd data-testid="heston-execution-source">
+                    {executionSource === 'remote' ? 'Remote API' : 'Local browser fallback'}
+                  </dd>
+                </div>
+              </dl>
+            </>
           ) : null}
         </div>
       </section>

@@ -2186,6 +2186,16 @@ h3 {
   margin-top: 24px;
 }
 
+.calibration-execution-notice {
+  margin: 24px 0 0;
+  padding: 12px 14px;
+  border-left: 2px solid var(--warm);
+  background: color-mix(in srgb, var(--warm) 8%, transparent);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .calibration-diagnostics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
