@@ -1,5 +1,12 @@
 # Option Model Lab — Architecture
 
+## Document status
+
+Sections 1–10 record the browser-first architecture that established the project. That constraint
+was intentional and remains the reason most calculations still execute locally. Section 11 records
+the measured Phase 2 evolution to a hybrid monorepo and supersedes only the initial statements about
+repository layout, production base path, and the absence of a backend.
+
 ## 1. Architectural objective
 
 The initial application must be fully static and deployable through GitHub Pages.
@@ -344,7 +351,7 @@ The existence of advanced mathematics alone is not sufficient justification.
 
 ---
 
-## 10. GitHub Pages deployment
+## 10. Initial GitHub Pages deployment
 
 The application must build to static assets.
 
@@ -357,6 +364,92 @@ https://<user>.github.io/<repository>/
 Routing must work when deployed below a repository subpath.
 
 Prefer routing that does not require server-side URL rewrites unless the GitHub Pages deployment explicitly handles fallback behavior.
+
+This repository-subpath strategy described the initial deployment. The current canonical frontend
+is the GitHub Pages custom domain `https://pricing.lucaslebihan.dev/`, so production assets now use
+`base = "/"`. Hash navigation continues to avoid server rewrite requirements.
+
+---
+
+## 11. Phase 2 — measured hybrid architecture
+
+### 11.1 Why the architecture evolved
+
+The fully static application proved the product and supported five model families before any remote
+service was introduced. Profiling then showed one current workflow with materially different
+characteristics: the 15-quote Heston calibration took roughly 174 ms and had already moved into a
+Web Worker to protect the interface. Other sophisticated calculations remained between microseconds
+and a few tens of milliseconds.
+
+The backend therefore exists for a measured workload, not because quantitative code is assumed to
+belong on a server. The detailed classification is maintained in
+[`COMPUTATION_BOUNDARIES.md`](COMPUTATION_BOUNDARIES.md).
+
+### 11.2 Repository boundaries
+
+```text
+option-model-lab/
+├── frontend/                 static React/TypeScript/Vite application
+│   ├── src/api/              public environment config and typed model calls
+│   ├── src/quant/            framework-independent browser quant
+│   └── src/features/         UI-facing transformations and execution orchestration
+├── backend/                  stateless FastAPI application
+│   ├── app/api/              Pydantic schemas and HTTP routes
+│   └── app/quant/            framework-independent Python quant
+├── fixtures/                 cross-language numerical references
+├── deploy/                   production preparation, not application logic
+└── docs/
+```
+
+No monorepo framework coordinates these projects. The frontend lockfile/toolchain and Python
+environment remain independent, as do their CI workflows.
+
+### 11.3 Runtime dependency direction
+
+```text
+React feature
+    │
+    ▼
+feature execution policy
+    ├── local TypeScript quant / model-specific Web Worker
+    └── typed API client
+             │ HTTPS
+             ▼
+       FastAPI + Pydantic
+             │
+             ▼
+       Python quant function
+```
+
+React components do not construct API URLs, FastAPI routes do not contain pricing algorithms, and
+neither quant implementation depends on its transport framework. Shared Heston fixtures enforce the
+documented floating-point parity without demanding universal pricing or calibration interfaces.
+
+### 11.4 Current execution policy
+
+- Black–Scholes pricing, Greeks, implied volatility, Explore grids, SABR, Local Vol, Merton, and
+  Compare remain local.
+- Heston calibration calls `POST /api/v1/heston/calibrate` by default.
+- Network failures and server 5xx responses trigger the numerically matched Worker fallback with a
+  visible execution label.
+- Validation errors and malformed responses are shown as errors and are not bypassed locally.
+- Learn and all local workflows remain functional without the API.
+
+Every public expensive endpoint must remain model-specific, stateless, and bounded by request size
+dimensions and solver work. The first endpoint limits quote count, maturity, financial magnitudes,
+objective tolerance, and optimizer iterations.
+
+### 11.5 Environments and deployment boundary
+
+```text
+Development: http://localhost:5173 → http://127.0.0.1:8000
+Production:  https://pricing.lucaslebihan.dev → https://api.pricing.lucaslebihan.dev
+```
+
+Vite selects the public API address through `VITE_API_BASE_URL`; it contains no secret. FastAPI
+selects explicit CORS origins through server-side environment variables. Production frontend assets
+remain static on GitHub Pages. Caddy and the VPS are deployment concerns outside quantitative code,
+and no CI workflow deploys to the VPS at this phase.
 
 The production build must be testable locally before deployment.
 

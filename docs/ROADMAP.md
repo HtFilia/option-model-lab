@@ -8,6 +8,11 @@ Do not implement many incomplete models in parallel.
 
 A milestone is complete only when its quantitative logic, tests, educational content, interactions, and deployment are coherent.
 
+The project began as a fully static browser application. Black–Scholes, Heston, Merton Jump
+Diffusion, SABR, Local Vol, and the first Compare workflow were implemented before a backend was
+justified. The hybrid phase below is an evidence-based architectural evolution, not a revision of
+that history.
+
 ---
 
 # Milestone 0 — Repository and product skeleton
@@ -289,6 +294,43 @@ Introduce the principle:
 \]
 
 If an educational exotic is introduced, keep it intentionally simple and use it only to demonstrate model risk.
+
+---
+
+# Architecture phase 2 — Hybrid quantitative computation
+
+## Objective
+
+Add a small remote computation boundary only where measured work benefits from server execution,
+while preserving the static site and local interactive models.
+
+## First vertical slice
+
+- restructure the repository into independent `frontend/` and `backend/` tools;
+- deploy the frontend at the custom-domain root;
+- add a stateless FastAPI service with explicit CORS and health checks;
+- document measured `LOCAL`, `LOCAL + WEB WORKER`, `REMOTE`, and `BENCHMARK FIRST` decisions;
+- port only Heston calibration to a bounded, versioned endpoint;
+- enforce TypeScript/Python numerical parity with shared fixtures;
+- keep the browser Worker as an explicit availability fallback;
+- verify frontend and backend independently in CI;
+- prepare, but do not automate, VPS/Caddy deployment.
+
+## Acceptance criteria
+
+- frontend-only development requires no DNS, Internet connection, or VPS;
+- full local development connects `localhost:5173` to `127.0.0.1:8000`;
+- production configuration targets `api.pricing.lucaslebihan.dev` centrally;
+- React survives backend failure and identifies local fallback results;
+- public numerical work has server-side limits;
+- Python quantitative code is directly pytest-testable without HTTP;
+- no database, authentication, queue, generic job platform, or speculative model framework exists.
+
+## Next architectural increment
+
+Observe production calibration latency, errors, concurrency, and VPS resource use before adding a
+second remote model. Merton calibration, SABR, current Local Vol reconstruction, and Compare remain
+local until new measurements justify another boundary.
 
 ---
 
