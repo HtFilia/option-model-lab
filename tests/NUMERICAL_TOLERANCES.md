@@ -1,0 +1,25 @@
+# Numerical test tolerances
+
+Tolerances are selected per numerical operation rather than globally:
+
+- Published analytic Black–Scholes prices, delta, theta, rho, and vega use absolute tolerances from `1e-12` to `1e-11`. The normal CDF dependency is accurate to near machine precision, so these checks primarily cover formula regressions.
+- Gamma uses `1e-14` against its analytic reference because it has a smaller magnitude.
+- Put-call parity uses `3e-14`, allowing only a few floating-point rounding units after cancellation of prices around 100 currency units.
+- Centered finite-difference delta uses step `1e-3` and absolute tolerance `2e-9`.
+- Centered finite-difference gamma uses the larger step `0.1` to control cancellation and absolute tolerance `3e-8`.
+- Centered finite-difference raw vega uses volatility step `1e-4` and absolute tolerance `2e-6`.
+- Implied-volatility recovery uses absolute volatility and repricing tolerances of `1e-9`, slightly wider than the solver’s internal price criterion to include bisection termination and repricing roundoff.
+- Cached QuantLib analytic Heston prices use an absolute price tolerance of `2e-6`. The source values are published to seven decimal places, so a tighter assertion would test unavailable reference digits rather than the Fourier implementation.
+- The near-zero vol-of-vol Heston limit is compared with Black–Scholes to `5e-6`. This covers fixed-quadrature and deterministic-limit rounding while remaining far below one price basis point for the test contract.
+- Heston put-call parity uses `1e-13`, because both option types are derived from the same call value and discounted parity terms.
+- Synthetic Heston calibration is required to reduce normalized price RMSE by at least 90% and reach the documented `5e-4` objective tolerance. Parameter equality is deliberately not asserted because surface parameters can be weakly identified.
+- The comparison anchor requires Black–Scholes and Heston prices to agree within `1e-8`. This is wider than the implied-volatility solver's internal price tolerance but still negligible at the displayed six-decimal precision. The Heston smile must span more than two volatility points and differ from the fitted flat volatility by more than one point under the deterministic default scenario; these are pedagogical-regression thresholds rather than pricer accuracy tolerances.
+- The cached QuantLib/Haug Merton reference is asserted to `1e-2` because the published regression value contains only two decimal places. The zero-intensity Black–Scholes limit is exact by implementation branch, while Merton put–call parity uses `2e-14`.
+- Adaptive Merton summation must omit no more than `1e-13` Poisson probability. Numerical trapezoidal integration of the terminal log-return density over the documented wide range uses `2e-7`, covering range truncation and quadrature error rather than pricing error.
+- The default Merton educational smile must span at least three volatility points. Its deterministic calibration must reduce normalized price RMSE by at least 92% and reach the documented `2e-5` objective tolerance; exact parameter recovery is not required because jump parameters can compensate for one another on a single maturity.
+- Cached SABR lognormal-volatility values are asserted to 12 decimal places against an independent transcription of QuantLib's published Hagan formula. ATM continuity is checked to eight decimal places across relative strike perturbations of `1e-9`, which is tight enough to detect an unstable `0/0` evaluation while allowing the perturbation's real first-order skew.
+- SABR Black-76 put–call parity is asserted to 14 decimal places because call and put share the same implied volatility and discount inputs. The deterministic SABR calibration must reduce volatility RMSE by at least 99% and reach `2e-5`; synthetic parameter recovery uses local decimal checks because a finite coordinate search need not land bit-for-bit on the generating point.
+- SSVI ATM volatility and the flat-surface Dupire limit are asserted to 14 decimal places because both are algebraic identities. Positive calendar growth and the Dupire density denominator are checked across the complete controlled strike/maturity grid rather than against one global tolerance.
+- Four-point total-variance interpolation reproduces quote nodes to 14 decimal places. Between nodes it must remain within `2e-6` total-variance units of analytic SSVI. Noiseless reconstructed local volatility may differ by at most `0.007` absolute volatility in the displayed wings; this deliberately includes sparse interpolation and second-derivative error rather than loosening an analytic formula check. A 20-basis-point deterministic quote perturbation must at least double reconstruction RMSE.
+
+These tolerances are intentionally local to each test and should change only with a documented numerical reason.
