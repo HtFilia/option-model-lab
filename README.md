@@ -1,5 +1,11 @@
 # Option Model Lab
 
+[![Verify and deploy](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](https://www.typescriptlang.org/)
+[![Static deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-222222)](https://htfilia.github.io/option-model-lab/)
+
+**[Open the live interactive lab →](https://htfilia.github.io/option-model-lab/)**
+
 An interactive educational laboratory for understanding why option-pricing models exist, how their parameters shape outputs, how calibration works, and where each model fails.
 
 The laboratory currently covers Black–Scholes, Heston, Merton Jump Diffusion, SABR, and Local Vol through four modes:
