@@ -1,0 +1,42 @@
+[
+  {
+    "option": { "type": "call", "strike": 0.9, "timeToMaturity": 0.7 },
+    "market": {
+      "spot": 0.9792189645694596,
+      "riskFreeRate": 0.05,
+      "dividendYield": 0.02
+    },
+    "parameters": {
+      "initialVariance": 0.09,
+      "longRunVariance": 0.08,
+      "meanReversion": 1.2,
+      "volatilityOfVariance": 1.8,
+      "correlation": -0.45
+    },
+    "expectedPrice": 0.1330369923510888
+  },
+  {
+    "option": { "type": "put", "strike": 110, "timeToMaturity": 2 },
+    "market": { "spot": 100, "riskFreeRate": 0.03, "dividendYield": 0.01 },
+    "parameters": {
+      "initialVariance": 0.04,
+      "longRunVariance": 0.05,
+      "meanReversion": 1.5,
+      "volatilityOfVariance": 0.5,
+      "correlation": -0.7
+    },
+    "expectedPrice": 13.43667531499203
+  },
+  {
+    "option": { "type": "call", "strike": 85, "timeToMaturity": 0.25 },
+    "market": { "spot": 92, "riskFreeRate": -0.005, "dividendYield": 0.025 },
+    "parameters": {
+      "initialVariance": 0.0225,
+      "longRunVariance": 0.04,
+      "meanReversion": 3,
+      "volatilityOfVariance": 0.35,
+      "correlation": 0.15
+    },
+    "expectedPrice": 7.053502276082284
+  }
+]

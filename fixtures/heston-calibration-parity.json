@@ -1,0 +1,14 @@
+{
+  "market": { "spot": 100, "riskFreeRate": 0.03, "dividendYield": 0.01 },
+  "parameters": {
+    "initialVariance": 0.03839216306102245,
+    "longRunVariance": 0.054304538070242034,
+    "meanReversion": 0.9304830919515841,
+    "volatilityOfVariance": 0.39685304756214984,
+    "correlation": -0.6921517651862391
+  },
+  "initialObjective": 0.014319147618210477,
+  "finalObjective": 0.0004229032222381791,
+  "iterations": 84,
+  "evaluations": 139
+}

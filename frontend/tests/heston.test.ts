@@ -12,6 +12,8 @@ import {
   defaultHestonParameters,
   simulateHestonVolatilityPaths,
 } from '../src/features/hestonLab';
+import parityCases from '../../fixtures/heston-parity.json';
+import calibrationParity from '../../fixtures/heston-calibration-parity.json';
 
 const referenceInput: HestonInput = {
   option: { type: 'call', strike: 1, timeToMaturity: 0.7 },
@@ -30,6 +32,21 @@ const referenceInput: HestonInput = {
 };
 
 describe('Heston Fourier pricing', () => {
+  it('matches the shared TypeScript/Python parity fixture', () => {
+    for (const testCase of parityCases) {
+      const result = priceHeston({
+        option: {
+          type: testCase.option.type as 'call' | 'put',
+          strike: testCase.option.strike,
+          timeToMaturity: testCase.option.timeToMaturity,
+        },
+        market: testCase.market,
+        parameters: testCase.parameters,
+      });
+      expect(Math.abs(result.price - testCase.expectedPrice)).toBeLessThanOrEqual(2e-10);
+    }
+  });
+
   it('matches cached QuantLib analytic-engine prices', () => {
     const cases = [
       { strike: 0.9, expected: 0.1330371 },
@@ -130,12 +147,27 @@ describe('Heston educational workflows', () => {
   });
 
   it('reduces the deterministic surface-calibration objective materially', () => {
-    const market = { spot: 100, riskFreeRate: 0.03, dividendYield: 0.01 };
+    const market = calibrationParity.market;
     const fixture = buildHestonCalibrationFixture(market);
     const result = calibrateHestonFixture(market, fixture);
     expect(fixture).toHaveLength(15);
     expect(result.converged).toBe(true);
     expect(result.finalObjective).toBeLessThan(result.initialObjective * 0.1);
     expect(result.fit).toHaveLength(fixture.length);
+    expect(result.iterations).toBe(calibrationParity.iterations);
+    expect(result.evaluations).toBe(calibrationParity.evaluations);
+    expect(
+      Math.abs(result.initialObjective - calibrationParity.initialObjective),
+    ).toBeLessThanOrEqual(2e-12);
+    expect(Math.abs(result.finalObjective - calibrationParity.finalObjective)).toBeLessThanOrEqual(
+      2e-12,
+    );
+    for (const key of Object.keys(calibrationParity.parameters) as Array<
+      keyof typeof calibrationParity.parameters
+    >) {
+      expect(
+        Math.abs(result.parameters[key] - calibrationParity.parameters[key]),
+      ).toBeLessThanOrEqual(2e-12);
+    }
   });
 });
