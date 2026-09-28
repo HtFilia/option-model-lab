@@ -1,5 +1,7 @@
 # Option Model Lab
 
+![Project overview — Lucas Lebihan, Quantitative Engineer](docs/assets/project-header.png)
+
 [![Frontend and Pages](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml)
 [![Backend CI](https://github.com/HtFilia/option-model-lab/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/backend-ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](https://www.typescriptlang.org/)
