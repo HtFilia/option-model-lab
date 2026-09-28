@@ -198,3 +198,21 @@ test('keeps navigation context and remains usable on a narrow screen', async ({ 
       .toBeLessThanOrEqual(1);
   }
 });
+
+test('serves the shared identity without replacing application navigation', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.brand')).toContainText('Option Model Lab');
+  await expect(page.locator('button a')).toHaveCount(0);
+  await expect(page.locator('.site-footer a')).toHaveAttribute(
+    'href',
+    'https://lucaslebihan.dev/en/',
+  );
+  const fonts = await page.evaluate(async () => {
+    await document.fonts.ready;
+    return [...document.fonts]
+      .filter((font) => font.status === 'loaded')
+      .map((font) => font.family);
+  });
+  expect(fonts).toContain('Inter Variable');
+  expect(fonts).toContain('IBM Plex Mono');
+});

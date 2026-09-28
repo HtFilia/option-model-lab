@@ -282,7 +282,7 @@ export default function App() {
       </Suspense>
 
       <footer className="site-footer">
-        <span>Option Model Lab</span>
+        <a href="https://lucaslebihan.dev/en/">Lucas Lebihan · Quantitative Engineer</a>
         <span>Educational model · not trading advice</span>
       </footer>
     </div>
