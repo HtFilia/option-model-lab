@@ -112,7 +112,7 @@ directly without HTTP; routes only validate and translate model-specific request
 ## Production boundaries
 
 - `https://pricing.lucaslebihan.dev/` is a root-based static GitHub Pages build.
-- `https://api.pricing.lucaslebihan.dev` is the intended public API address on the VPS.
+- `https://api.pricing.lucaslebihan.dev` is the public API address, served from the VPS.
 - Caddy terminates HTTPS and reverse-proxies privately to FastAPI.
 - GitHub Actions verifies frontend and backend independently; no workflow deploys to the VPS yet.
 

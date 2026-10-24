@@ -6,6 +6,10 @@ Option Model Lab is an interactive educational web application for understanding
 
 The application is not intended to be a trading platform, production pricer, or market-data terminal.
 
+Status (October 2026): Black-Scholes, Heston, Merton Jump Diffusion, SABR, Local Vol and a first
+Compare workflow are implemented. Rough Bergomi, Rough Heston and Stochastic Local Vol are planned.
+The sections below describe the product's targets, not only what exists today.
+
 Its central teaching principle is:
 
 > Every model exists because another model fails somewhere.
@@ -176,7 +180,7 @@ Examples:
 - SABR: smile calibration for a maturity;
 - Heston: surface calibration;
 - Local Vol: surface-to-local-vol reconstruction;
-- Rough Bergomi: stochastic-volatility calibration with expensive numerical pricing.
+- Rough Bergomi (planned): stochastic-volatility calibration with expensive numerical pricing.
 
 ---
 

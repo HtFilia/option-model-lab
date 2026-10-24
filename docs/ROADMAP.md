@@ -17,6 +17,8 @@ that history.
 
 # Milestone 0 — Repository and product skeleton
 
+Status: done.
+
 ## Objective
 
 Create the smallest maintainable application skeleton and establish engineering constraints.
@@ -51,6 +53,8 @@ Create the smallest maintainable application skeleton and establish engineering 
 ---
 
 # Milestone 1 — Black-Scholes vertical slice
+
+Status: done.
 
 ## Objective
 
@@ -137,6 +141,8 @@ A user should be able to explain:
 
 # Milestone 2 — Heston vertical slice
 
+Status: done.
+
 ## Objective
 
 Introduce stochastic volatility and validate the application's ability to support a structurally different model.
@@ -212,6 +218,8 @@ Do not preserve abstractions that make either model harder to understand.
 
 # Milestone 3 — Broaden model families
 
+Status: done (Merton Jump Diffusion, SABR, Local Vol).
+
 Add models one at a time.
 
 ## 3A — Merton Jump Diffusion
@@ -265,6 +273,8 @@ Implementation objective:
 
 # Milestone 4 — Compare and model risk
 
+Status: a first Compare workflow is done; the other comparisons listed here are open.
+
 ## Objective
 
 Make the project explain why calibration is not the end of the modelling problem.
@@ -298,6 +308,8 @@ If an educational exotic is introduced, keep it intentionally simple and use it 
 ---
 
 # Architecture phase 2 — Hybrid quantitative computation
+
+Status: done. The Heston calibration API is served at `api.pricing.lucaslebihan.dev`; deployment stays manual.
 
 ## Objective
 
@@ -335,6 +347,8 @@ local until new measurements justify another boundary.
 ---
 
 # Milestone 5 — Advanced volatility models
+
+Status: planned; no rough-volatility model is implemented.
 
 ## 5A — Rough Bergomi
 
@@ -385,6 +399,8 @@ Only implement if it adds a distinct educational story rather than model-count i
 
 # Milestone 6 — Polish
 
+Status: open; the items below are candidates, not commitments.
+
 Possible improvements:
 
 - shareable URL-encoded scenarios;
@@ -406,7 +422,7 @@ Until justified by a new requirement:
 
 - user authentication;
 - database;
-- remote backend;
+- remote computation beyond the bounded Heston calibration endpoint;
 - real-time market data;
 - cloud jobs;
 - distributed computation;
@@ -415,7 +431,7 @@ Until justified by a new requirement:
 - portfolio aggregation;
 - trade storage;
 - live P&L;
-- deployment beyond static hosting.
+- deployment beyond the static site and the single stateless API.
 
 ---
 
