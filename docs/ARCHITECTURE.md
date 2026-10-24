@@ -570,6 +570,9 @@ The initial application has:
 - no persistent user storage requirement;
 - no backend.
 
+The current application adds one stateless calibration API (section 11). It still has no
+authentication, personal data or user storage.
+
 Avoid introducing analytics or third-party scripts unless explicitly requested later.
 
 ---
