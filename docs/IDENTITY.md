@@ -1,18 +1,20 @@
 # Visual identity
 
 Option Model Lab belongs to Lucas Lebihan's professional project family:
-**Quantitative Engineer · Equity ETF · Delta One · Pricing**.
+**Quantitative Engineer / Quant Developer · Equity ETF · Delta One · Pricing**.
 
 Keep the existing dark-ink / warm-paper themes, sage and ochre colours, thin rules
 and restrained chart grids. Inter Variable is now locally served for interface
 text, with IBM Plex Mono for short labels. Packages are pinned in the frontend
 lockfile; no font service is contacted by the browser.
 
-The app's favicon matches the portfolio. Every model/mode shares the same footer
-link back to the author's portfolio. Numerical chart colours and model behaviour
+The app's favicon matches the portfolio. Every model/mode opens with the author bar
+shared by the portfolio's demos (portfolio, résumé, contact) and ends with the same
+footer link back to the portfolio. Numerical chart colours and model behaviour
 remain independent of decorative social artwork.
 
-`frontend/public/og.png` is a 1200 × 630 social preview, and
+`frontend/public/og.png` is a 1200 × 630 social preview (the lab's Heston Explore
+view on the portfolio's paper card, as for the other demos), and
 `docs/assets/project-header.png` is a compact 1280 × 360 README cover.
 Their editable sources and rebuild script live in the author's private webfolio
 repository under `brand/` and `scripts/build-brand.mjs`. Copies are committed

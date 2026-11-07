@@ -158,6 +158,17 @@ export default function App() {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
+      {/* Who built the lab and how to reach him, as on the other demos (2026-11-07). */}
+      <div className="author-bar">
+        <a className="author" href="https://lucaslebihan.dev/en/?ref=oml">
+          Lucas Lebihan <span>· Quantitative Engineer / Quant Developer</span>
+        </a>
+        <nav aria-label="Author">
+          <a href="https://lucaslebihan.dev/en/?ref=oml">Portfolio</a>
+          <a href="https://lucaslebihan.dev/cv-en.pdf">Résumé</a>
+          <a href="mailto:contact@lucaslebihan.dev?subject=Option%20Model%20Lab">Contact</a>
+        </nav>
+      </div>
       <header className="site-header">
         <button className="brand" type="button" onClick={() => navigateMode('learn')}>
           <span className="brand-mark" aria-hidden="true">
@@ -282,7 +293,9 @@ export default function App() {
       </Suspense>
 
       <footer className="site-footer">
-        <a href="https://lucaslebihan.dev/en/">Lucas Lebihan · Quantitative Engineer</a>
+        <a href="https://lucaslebihan.dev/en/?ref=oml">
+          Lucas Lebihan · Quantitative Engineer / Quant Developer
+        </a>
         <span>Educational model · not trading advice</span>
       </footer>
     </div>
