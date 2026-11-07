@@ -205,7 +205,16 @@ test('serves the shared identity without replacing application navigation', asyn
   await expect(page.locator('button a')).toHaveCount(0);
   await expect(page.locator('.site-footer a')).toHaveAttribute(
     'href',
-    'https://lucaslebihan.dev/en/',
+    'https://lucaslebihan.dev/en/?ref=oml',
+  );
+  const author = page.getByRole('navigation', { name: 'Author' });
+  await expect(author.getByRole('link', { name: 'Résumé' })).toHaveAttribute(
+    'href',
+    'https://lucaslebihan.dev/cv-en.pdf',
+  );
+  await expect(author.getByRole('link', { name: 'Contact' })).toHaveAttribute(
+    'href',
+    'mailto:contact@lucaslebihan.dev?subject=Option%20Model%20Lab',
   );
   const fonts = await page.evaluate(async () => {
     await document.fonts.ready;

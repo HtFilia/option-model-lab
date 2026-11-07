@@ -1,6 +1,6 @@
 # Option Model Lab
 
-![Project overview — Lucas Lebihan, Quantitative Engineer](docs/assets/project-header.png)
+![Option Model Lab — Learn, explore and calibrate option-pricing models. Personal project by Lucas Lebihan, Quantitative Engineer / Quant Developer](docs/assets/project-header.png)
 
 [![Frontend and Pages](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/pages.yml)
 [![Backend CI](https://github.com/HtFilia/option-model-lab/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/HtFilia/option-model-lab/actions/workflows/backend-ci.yml)
