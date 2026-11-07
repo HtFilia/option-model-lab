@@ -14,10 +14,11 @@ footer link back to the portfolio. Numerical chart colours and model behaviour
 remain independent of decorative social artwork.
 
 `frontend/public/og.png` is a 1200 × 630 social preview (the lab's Heston Explore
-view on the portfolio's paper card, as for the other demos), and
+view in its light theme, on the portfolio's paper card, as for the other demos), and
 `docs/assets/project-header.png` is a compact 1280 × 360 README cover.
 Their editable sources and rebuild script live in the author's private webfolio
 repository under `brand/` and `scripts/build-brand.mjs`. Copies are committed
 here so this project builds independently. Update HTML image dimensions when
-replacing social artwork. Font licenses are distributed with the Fontsource
+replacing social artwork, and change the `?v=` suffix of its URL in `index.html` so LinkedIn and
+other sites fetch the new image instead of their cached copy. Font licenses are distributed with the Fontsource
 packages.
